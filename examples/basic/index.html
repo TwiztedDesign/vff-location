@@ -5,20 +5,42 @@
     <title>VFF Extension basic example</title>
 
     <script src="https://rawgit.com/TwiztedDesign/vff/master/dist/vff.js"></script>
-    <script src="../../dist/vff-ext.js"></script>
+    <script src="../../dist/vff-location.js"></script>
 
+    <!--Leaflet-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+          integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+          crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+            integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+            crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.3/leaflet.draw.js"/>
 </head>
 <body>
 
-    <h1>This is a basic example of the vff extension</h1>
+    <h1>This is a basic example of the vff location extension</h1>
 
     <vff-title text="This is a vff wrapped title"></vff-title>
 
     <h3>VFF api usage</h3>
+
+    <div id="mapid" style="height: 380px; width: 600px"></div>
+
+    <button id="myLocationBtn">
+        My location
+    </button>
+
+    <button id="boundsBtn">
+        bounds
+    </button>
+
+    <button id="containsBtn">
+        contains
+    </button>
+
     <div id="results"></div>
 
-
     <script src="./script.js"></script>
-
 </body>
 </html>

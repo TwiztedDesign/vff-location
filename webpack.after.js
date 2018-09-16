@@ -5,7 +5,7 @@ try{
 } catch (err){}
 
 
-var files = ['vff-ext.js','vff-ext.js.map'];
+var files = ['vff-location.js','vff-location.js.map'];
 var source = './dist/';
 
 function copyCB(src,dest){

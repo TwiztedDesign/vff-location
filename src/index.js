@@ -1,11 +1,11 @@
 /**=============== Examples =================**/
 // require('./examples/vff-title-element');
-// require('./examples/vff-calculator-api');
+var vffLocationApi = require('./vff-location-api');
 /**==========================================**/
 
 /**======= To define new vff element ==============**/
 // window.vff.define(element-name, element-class);
 
 /**======= To extend vff with new functions =======**/
-// window.vff.extend(api-namespace, api-object);
+window.vff.extend("location", vffLocationApi);
 
