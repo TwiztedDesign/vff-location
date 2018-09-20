@@ -112,13 +112,15 @@ boundsBtn.onclick = function() {
 
         let data = {
             metadata:{
-                targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
+                // targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
+                targetGeo:`${coords.longitude + constValue2},${coords.latitude + constValue2},${coords.longitude},${coords.latitude}`
             }
         };
 
-        vff._queryParams = {
+        window.vff._vffData = new vff.VffData();
+        window.vff._vffData.addQueryParams({
             _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
-        };
+        });
         let result = vff.location.intersects(data);
         console.log(result);
     });
@@ -140,25 +142,66 @@ containsBtn.onclick = function() {
         // zoom the map to the rectangle bounds
         mymap.fitBounds(bounds1);
 
-        let constValue2 = 0.01;
-        //bounds 2
-        var bounds2 = [[coords.latitude + constValue2, coords.longitude + constValue2], [coords.latitude, coords.longitude]];
-        // create an blue rectangle
-        L.rectangle(bounds2, {color: "#9b87ff", weight: 1}).addTo(mymap);
-        // zoom the map to the rectangle bounds
-        mymap.fitBounds(bounds2);
+        // My Location
+        L.marker([coords.latitude, coords.longitude]).addTo(mymap);
+
 
         let data = {
             metadata:{
-                targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
+                targetGeo:`${coords.longitude + constValue},${coords.latitude - constValue},${coords.longitude - constValue},${coords.latitude + constValue}`
             }
         };
 
-        vff._queryParams = {
-            _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
-        };
-        let result = vff.location.intersects(data);
-        console.log(result);
+        let notContainsCallBack = document.createElement("div");
+        vff.location.contains(data,(result)=>{
+            notContainsCallBack.innerText = `The result is - ${result}, callback`;
+        });
+        results.appendChild(notContainsCallBack);
+
+
+        // let notContainsPromise = document.createElement("div");
+        // vff.location.contains(data).then((result) => {
+        //     notContainsPromise.innerText = `The result is - ${result}, promise`;
+        // });
+        // results.appendChild(notContainsPromise);
+    });
+};
+
+
+var outOfBoundBtn = document.getElementById('outOfBoundsBtn');
+outOfBoundBtn.onclick = function() {
+    clearAll();
+    vff.location.mine().then(function(coords){
+        // let constValue = 0.005;
+        // mymap.setView([coords.latitude, coords.longitude], 12,{"animate":true});
+        //
+        // //bounds 1
+        // // define rectangle geographical bounds
+        // var bounds1 = [[coords.latitude - constValue, coords.longitude + constValue], [coords.latitude + constValue, coords.longitude - constValue]];
+        // // create an orange rectangle
+        // L.rectangle(bounds1, {color: "#ff7800", weight: 1}).addTo(mymap);
+        // // zoom the map to the rectangle bounds
+        // mymap.fitBounds(bounds1);
+        //
+        // let constValue2 = 0.01;
+        // //bounds 2
+        // var bounds2 = [[coords.latitude + constValue2, coords.longitude + constValue2], [coords.latitude, coords.longitude]];
+        // // create an blue rectangle
+        // L.rectangle(bounds2, {color: "#9b87ff", weight: 1}).addTo(mymap);
+        // // zoom the map to the rectangle bounds
+        // mymap.fitBounds(bounds2);
+        //
+        // let data = {
+        //     metadata:{
+        //         targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
+        //     }
+        // };
+        //
+        // vff._queryParams = {
+        //     _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
+        // };
+        // let result = vff.location.intersects(data);
+        // console.log(result);
     });
 };
 

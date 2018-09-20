@@ -42,11 +42,10 @@ var vffLocationApi = {
 
     // Is my location in data.metadata.targetGeo
     contains: function(data,callback) {
-        const func = this ? this.mine : this;
-
+        const func = this ? this.contains : this;
         if (callback === undefined) {
             return new Promise(function (resolve, reject) {
-                func(function (err, result) {
+                func(data, function(err, result) {
                     err ? reject(err) : resolve(result);
                 });
             });
@@ -59,8 +58,9 @@ var vffLocationApi = {
                 let myLocation = L.latLng(coords.latitude, coords.longitude,coords.altitude);
                 callback(metadataBounds.contains(myLocation));
             });
+        }else{
+            callback(isContains);
         }
-        callback(isContains);
     }
 };
 
