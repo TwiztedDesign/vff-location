@@ -1,13 +1,7 @@
 import * as L from 'leaflet';
+var geoHelpers = require('../helpers/geo-leaflet');
 
 var vffLocationApi = {
-
-    getBound: function(points){
-        let pointsArr = points.split(',');
-        let metadata1 = L.latLng(pointsArr[1], pointsArr[0]);
-        let metadata2 = L.latLng(pointsArr[3], pointsArr[2]);
-        return L.latLngBounds(metadata1, metadata2);
-    },
 
     // Working with W3C Geolocation API
     mine: function(callback, options) {
@@ -32,8 +26,8 @@ var vffLocationApi = {
         let isIntersects = false;
         if ((data.metadata && data.metadata.targetGeo) &&
             (window.vff.getQueryParams() && window.vff.getQueryParams()._targetgeo)) {
-            let metadataBounds = this.getBound(data.metadata.targetGeo);
-            let queryParamBounds = this.getBound(window.vff.getQueryParams()._targetgeo);
+            let metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
+            let queryParamBounds = geoHelpers.getBound(window.vff.getQueryParams()._targetgeo);
 
             isIntersects = queryParamBounds.intersects(metadataBounds);
         }
@@ -42,25 +36,26 @@ var vffLocationApi = {
 
     // Is my location in data.metadata.targetGeo
     contains: function(data,callback) {
-        const func = this ? this.contains : this;
-        if (callback === undefined) {
-            return new Promise(function (resolve, reject) {
-                func(data, function(err, result) {
-                    err ? reject(err) : resolve(result);
-                });
-            });
-        }
+        callback = callback || function() {};
 
-        let isContains = false;
-        if (data.metadata && data.metadata.targetGeo) {
-            let metadataBounds = this.getBound(data.metadata.targetGeo);
-            this.mine().then(function(coords){
-                let myLocation = L.latLng(coords.latitude, coords.longitude,coords.altitude);
-                callback(metadataBounds.contains(myLocation));
-            });
-        }else{
-            callback(isContains);
-        }
+        return new Promise((resolve, reject) => {
+            let isContains = false;
+            if (data.metadata && data.metadata.targetGeo) {
+                let metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
+                this.mine().then(function(coords){
+                    let myLocation = L.latLng(coords.latitude, coords.longitude,coords.altitude);
+                    let answer = metadataBounds.contains(myLocation);
+                    resolve(answer);
+                    return callback(answer);
+                },function(err){
+                    reject(err);
+                    return callback(err,null);
+                });
+            }else{
+                resolve(isContains);
+                return callback(isContains);
+            }
+        });
     }
 };
 

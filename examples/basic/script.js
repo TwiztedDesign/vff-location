@@ -159,11 +159,11 @@ containsBtn.onclick = function() {
         results.appendChild(notContainsCallBack);
 
 
-        // let notContainsPromise = document.createElement("div");
-        // vff.location.contains(data).then((result) => {
-        //     notContainsPromise.innerText = `The result is - ${result}, promise`;
-        // });
-        // results.appendChild(notContainsPromise);
+        let notContainsPromise = document.createElement("div");
+        vff.location.contains(data).then((result) => {
+            notContainsPromise.innerText = `The result is - ${result}, promise`;
+        });
+        results.appendChild(notContainsPromise);
     });
 };
 

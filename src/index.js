@@ -1,6 +1,6 @@
 /**=============== Examples =================**/
 // require('./examples/vff-title-element');
-var vffLocationApi = require('./vff-location-api');
+var vffLocationApi = require('./core/vff-location-api');
 /**==========================================**/
 
 /**======= To define new vff element ==============**/
