@@ -1,47 +1,79 @@
-# 🌮 VFF extension boilerplate 🌮
+# 🌎 VFF Location extension 🌎
 ![MIT License](https://img.shields.io/github/license/TwiztedDesign/vff.svg)
 
 
 # Usage
-Create a new empty repo on GitHub 
-    
-    git clone https://github.com/TwiztedDesign/vff-extension-boilerplate.git [my-extension-name]
-    cd [my-extension-name] 
-   
-Clean the README
+Add vff-location.js to your project 
 
-    rm README.md && touch README.md
-    
-If you have LICENSE, you can clean it too.
+    <script src="https://rawgit.com/TwiztedDesign/vff-location/master/dist/vff-location.js"></script>
 
-    rm LICENSE
-    touch LICENSE
-    
-Remove all git info from the boilerplate
+## Supported Methods
+* mine - Get the current location
+* intersects - Return true or false, if the query params intersect the target geo of the event
+* contains - Return true or false if the target geo of the event contains the current location
 
-    rm -rf .git
-    
-Initiate the new git repo
+### Mine
+Return object with the current location of the device.
+It using 'navigator.geolocation' and the user needs to permit on his browser to share location.
 
-    git init
-    git add -A
-    git commit -m "first commit"
-    git remote add origin [my-extension remote repo]
-    git push -u origin master
-    
-Install Dependencies
+You can use callback or promises. Both supported.
+```javascript
+vff.location.mine((err, coords) => {
+    .....
+    });
+```
 
-    npm install
+```javascript
+vff.location.mine().then((coords) => {
+    .....
+    }).error((err) => {
+        ...
+    });
+```
 
-## Build
-    npm run build
-    
-This will generate the file /dist/vff-ext.js.  
-Include this in your html file after you include the vff script
+
+The returned object looks like:
+```
+{
+    accuracy: 30
+    altitude: null
+    altitudeAccuracy: null
+    heading: null
+    latitude: 32.2086025
+    longitude: 34.904941799999996
+    speed: null
+}
+ ```
+ 
+ 
+### Intersects
+Return true or false by checking if the geo area in the query params intersect the target geo of the event.
+In case one of them does not exist it returns false.
+
+```javascript
+vff.location.intersects(data);
+```
+### Contains
+Return true or false if the target geo of the event contains the current location
+It using vff.location.mine() to get the current location.
+
+You can use callback or promises. Both supported.
+```javascript
+vff.location.contains((err,result) => {
+    .....
+    });
+```
+
+```javascript
+vff.location.contains(data).then((result)=> {
+    .....
+    }).error((err) => {
+        ...
+    });
+```
 
 ### usage examples
-To check out the examples, uncomment the require statements in the index.html   
-and open examples/basic/index.html in your browser
+To check out the examples, open examples/basic/index.html in your browser
 
 
 ## Tests
@@ -49,10 +81,5 @@ Run tests:
 
     npm test 
 
-Watch tests:
-
-    npm run test-watch
-
-
-## 🍻 Cheers 🍻 
+## 🌎 Cheers 🌎 
 
