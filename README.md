@@ -74,7 +74,7 @@ vff.location.contains(data).then((result)=> {
 
 ### usage examples
 To check out the examples, open examples/basic/index.html in your browser
-
+![Alt Text](http://g.recordit.co/GHhm1lIAA1.gif)
 
 ## Tests
 Run tests:
