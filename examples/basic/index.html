@@ -17,7 +17,7 @@
             crossorigin=""></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.3/leaflet.draw.js"/>
 </head>
-<body>
+<body style="text-align: center">
 
     <h1>This is a basic example of the vff location extension</h1>
 
@@ -25,22 +25,27 @@
 
     <h3>VFF api usage</h3>
 
+    <div style="display: flex; justify-content: center; margin-bottom: 10px">
     <div id="mapid" style="height: 380px; width: 600px"></div>
-
+    </div>
     <button id="myLocationBtn">
         My location
     </button>
 
     <button id="boundsBtn">
-        bounds
-    </button>
-
-    <button id="containsBtn">
-        contains
+        Bounds
     </button>
 
     <button id="outOfBoundsBtn">
         Out Of Bounds
+    </button>
+
+    <button id="containsBtn">
+        Contains
+    </button>
+
+    <button id="notContainsBtn">
+        Not Contains
     </button>
 
     <div id="results"></div>

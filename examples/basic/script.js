@@ -75,7 +75,7 @@ function clearAll() {
 }
 
 //My location example
-var myLocationBtn = document.getElementById('myLocationBtn');
+let myLocationBtn = document.getElementById('myLocationBtn');
 myLocationBtn.onclick = function() {
     clearAll();
     vff.location.mine().then(function(coords){
@@ -87,7 +87,7 @@ myLocationBtn.onclick = function() {
 };
 
 //Bounds
-var boundsBtn = document.getElementById('boundsBtn');
+let boundsBtn = document.getElementById('boundsBtn');
 boundsBtn.onclick = function() {
     clearAll();
     vff.location.mine().then(function(coords){
@@ -117,17 +117,55 @@ boundsBtn.onclick = function() {
             }
         };
 
-        window.vff._vffData = new vff.VffData();
-        window.vff._vffData.addQueryParams({
-            _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
-        });
+        // window.vff._vffData.addQueryParams({
+        //     _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
+        // });
+        let result = vff.location.intersects(data);
+        console.log(result);
+    });
+};
+
+//Out of bounds
+let outOfBoundsBtn = document.getElementById('outOfBoundsBtn');
+outOfBoundsBtn.onclick = function() {
+    clearAll();
+    vff.location.mine().then(function(coords){
+        mymap.setView([coords.latitude, coords.longitude], 12,{"animate":true});
+
+        let constValue = 0.005;
+        //bounds 1
+        // define rectangle geographical bounds
+        var bounds1 = [[coords.latitude - constValue, coords.longitude + constValue], [coords.latitude + constValue, coords.longitude - constValue]];
+        // create an orange rectangle
+        L.rectangle(bounds1, {color: "#6bf442", weight: 1}).addTo(mymap);
+        // zoom the map to the rectangle bounds
+        mymap.fitBounds(bounds1);
+
+        let constValue2 = 0.01;
+        //bounds 2
+        var bounds2 = [[coords.latitude - constValue2, coords.longitude - 2 * constValue2], [coords.latitude - 2 * constValue2, coords.longitude + 2 * constValue2]];
+        // create an blue rectangle
+        L.rectangle(bounds2, {color: "#0e3004", weight: 1}).addTo(mymap);
+        // zoom the map to the rectangle bounds
+        mymap.fitBounds(bounds2);
+
+        let data = {
+            metadata:{
+                // targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
+                targetGeo:`${coords.longitude + constValue2},${coords.latitude + constValue2},${coords.longitude},${coords.latitude}`
+            }
+        };
+
+        // window.vff._vffData.addQueryParams({
+        //     _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
+        // });
         let result = vff.location.intersects(data);
         console.log(result);
     });
 };
 
 //contains
-var containsBtn = document.getElementById('containsBtn');
+let containsBtn = document.getElementById('containsBtn');
 containsBtn.onclick = function() {
     clearAll();
     vff.location.mine().then(function(coords){
@@ -168,40 +206,43 @@ containsBtn.onclick = function() {
 };
 
 
-var outOfBoundBtn = document.getElementById('outOfBoundsBtn');
-outOfBoundBtn.onclick = function() {
+let notContainsBtn = document.getElementById('notContainsBtn');
+notContainsBtn.onclick = function() {
     clearAll();
     vff.location.mine().then(function(coords){
-        // let constValue = 0.005;
-        // mymap.setView([coords.latitude, coords.longitude], 12,{"animate":true});
-        //
-        // //bounds 1
-        // // define rectangle geographical bounds
-        // var bounds1 = [[coords.latitude - constValue, coords.longitude + constValue], [coords.latitude + constValue, coords.longitude - constValue]];
-        // // create an orange rectangle
-        // L.rectangle(bounds1, {color: "#ff7800", weight: 1}).addTo(mymap);
-        // // zoom the map to the rectangle bounds
-        // mymap.fitBounds(bounds1);
-        //
-        // let constValue2 = 0.01;
-        // //bounds 2
-        // var bounds2 = [[coords.latitude + constValue2, coords.longitude + constValue2], [coords.latitude, coords.longitude]];
-        // // create an blue rectangle
-        // L.rectangle(bounds2, {color: "#9b87ff", weight: 1}).addTo(mymap);
-        // // zoom the map to the rectangle bounds
-        // mymap.fitBounds(bounds2);
-        //
-        // let data = {
-        //     metadata:{
-        //         targetGeo:`${coords.latitude + constValue2},${coords.longitude + constValue2},${coords.latitude},${coords.longitude}`
-        //     }
-        // };
-        //
-        // vff._queryParams = {
-        //     _targetgeo:`${coords.latitude - constValue},${coords.longitude + constValue},${coords.latitude + constValue},${coords.longitude- constValue}`
-        // };
-        // let result = vff.location.intersects(data);
-        // console.log(result);
+        let constValue = 0.008;
+        mymap.setView([coords.latitude, coords.longitude], 12,{"animate":true});
+
+        //bounds 1
+        // define rectangle geographical bounds
+        var bounds1 = [[coords.latitude - constValue, coords.longitude - 2 * constValue], [coords.latitude - 2 * constValue, coords.longitude + 2 * constValue]];
+        // create an orange rectangle
+        L.rectangle(bounds1, {color: "#4286f4", weight: 1}).addTo(mymap);
+        // zoom the map to the rectangle bounds
+        mymap.fitBounds(bounds1);
+
+        // My Location
+        L.marker([coords.latitude, coords.longitude]).addTo(mymap);
+
+
+        let data = {
+            metadata:{
+                targetGeo:`${coords.longitude - 2 * constValue},${coords.latitude - constValue},${coords.longitude + 2 * constValue},${coords.latitude - 2 * constValue}`
+            }
+        };
+
+        let notContainsCallBack = document.createElement("div");
+        vff.location.contains(data,(result)=>{
+            notContainsCallBack.innerText = `The result is - ${result}, callback`;
+        });
+        results.appendChild(notContainsCallBack);
+
+
+        let notContainsPromise = document.createElement("div");
+        vff.location.contains(data).then((result) => {
+            notContainsPromise.innerText = `The result is - ${result}, promise`;
+        });
+        results.appendChild(notContainsPromise);
     });
 };
 

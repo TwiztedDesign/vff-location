@@ -1,24 +1,22 @@
-import * as L from 'leaflet';
-var geoHelpers = require('../helpers/geo-leaflet');
+const geoHelpers = require('../helpers/geo-leaflet');
 
-var vffLocationApi = {
-
+const vffLocationApi = {
     // Working with W3C Geolocation API
     mine: function(callback, options) {
-        const func = this ? this.mine : this;
-        if (callback === undefined) {
-            return new Promise(function (resolve, reject) {
-                func(function (err, result) {
-                    err ? reject(err) : resolve(result);
-                }, options);
-            });
-        }
+        callback = callback || function() {};
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position, error) {
-                callback(error, position.coords);
-            }, options);
-        }
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position, error) => {
+                    window.console.log(position);
+                    resolve(position.coords);
+                    return callback(error, position.coords);
+                }, options);
+            }else{
+                reject('no permissions');
+                return callback('no permissions',null);
+            }
+        });
     },
 
     // Is data.metadata.targetGeo intersect with vff.getQueryParams()._targetgeo
@@ -26,10 +24,7 @@ var vffLocationApi = {
         let isIntersects = false;
         if ((data.metadata && data.metadata.targetGeo) &&
             (window.vff.getQueryParams() && window.vff.getQueryParams()._targetgeo)) {
-            let metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
-            let queryParamBounds = geoHelpers.getBound(window.vff.getQueryParams()._targetgeo);
-
-            isIntersects = queryParamBounds.intersects(metadataBounds);
+            isIntersects = geoHelpers.intersects(data.metadata.targetGeo,window.vff.getQueryParams()._targetgeo);
         }
         return isIntersects;
     },
@@ -41,10 +36,8 @@ var vffLocationApi = {
         return new Promise((resolve, reject) => {
             let isContains = false;
             if (data.metadata && data.metadata.targetGeo) {
-                let metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
                 this.mine().then(function(coords){
-                    let myLocation = L.latLng(coords.latitude, coords.longitude,coords.altitude);
-                    let answer = metadataBounds.contains(myLocation);
+                    let answer = geoHelpers.contains(coords, data.metadata.targetGeo);
                     resolve(answer);
                     return callback(answer);
                 },function(err){

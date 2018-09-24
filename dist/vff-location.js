@@ -72,7 +72,7 @@
 
 /**=============== Examples =================**/
 // require('./examples/vff-title-element');
-var vffLocationApi = __webpack_require__(3);
+var vffLocationApi = __webpack_require__(1);
 /**==========================================**/
 
 /**======= To define new vff element ==============**/
@@ -82,8 +82,108 @@ var vffLocationApi = __webpack_require__(3);
 window.vff.extend("location", vffLocationApi);
 
 /***/ }),
-/* 1 */,
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var geoHelpers = __webpack_require__(2);
+
+var vffLocationApi = {
+    // Working with W3C Geolocation API
+    mine: function mine(callback, options) {
+        callback = callback || function () {};
+
+        return new Promise(function (resolve, reject) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position, error) {
+                    window.console.log(position);
+                    resolve(position.coords);
+                    return callback(error, position.coords);
+                }, options);
+            } else {
+                reject('no permissions');
+                return callback('no permissions', null);
+            }
+        });
+    },
+
+    // Is data.metadata.targetGeo intersect with vff.getQueryParams()._targetgeo
+    intersects: function intersects(data) {
+        var isIntersects = false;
+        if (data.metadata && data.metadata.targetGeo && window.vff.getQueryParams() && window.vff.getQueryParams()._targetgeo) {
+            isIntersects = geoHelpers.intersects(data.metadata.targetGeo, window.vff.getQueryParams()._targetgeo);
+        }
+        return isIntersects;
+    },
+
+    // Is my location in data.metadata.targetGeo
+    contains: function contains(data, callback) {
+        var _this = this;
+
+        callback = callback || function () {};
+
+        return new Promise(function (resolve, reject) {
+            var isContains = false;
+            if (data.metadata && data.metadata.targetGeo) {
+                _this.mine().then(function (coords) {
+                    var answer = geoHelpers.contains(coords, data.metadata.targetGeo);
+                    resolve(answer);
+                    return callback(answer);
+                }, function (err) {
+                    reject(err);
+                    return callback(err, null);
+                });
+            } else {
+                resolve(isContains);
+                return callback(isContains);
+            }
+        });
+    }
+};
+
+module.exports = vffLocationApi;
+
+/***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _leaflet = __webpack_require__(3);
+
+var L = _interopRequireWildcard(_leaflet);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var geoHelpers = {
+    getBound: function getBound(points) {
+        var pointsArr = points.split(',');
+        var metadata1 = L.latLng(pointsArr[1], pointsArr[0]);
+        var metadata2 = L.latLng(pointsArr[3], pointsArr[2]);
+        return L.latLngBounds(metadata1, metadata2);
+    },
+
+    intersects: function intersects(area1, area2) {
+        var area1Bounds = geoHelpers.getBound(area1);
+        var area2Bounds = geoHelpers.getBound(area2);
+
+        return area1Bounds.intersects(area2Bounds);
+    },
+
+    contains: function contains(coords, area) {
+        var areaBounds = geoHelpers.getBound(area);
+        var location = L.latLng(coords.latitude, coords.longitude, coords.altitude);
+        return areaBounds.contains(location);
+    }
+};
+
+module.exports = geoHelpers;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* @preserve
@@ -13957,106 +14057,6 @@ window.L = exports;
 })));
 //# sourceMappingURL=leaflet-src.js.map
 
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _leaflet = __webpack_require__(2);
-
-var L = _interopRequireWildcard(_leaflet);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-var geoHelpers = __webpack_require__(4);
-
-var vffLocationApi = {
-
-    // Working with W3C Geolocation API
-    mine: function mine(callback, options) {
-        var func = this ? this.mine : this;
-        if (callback === undefined) {
-            return new Promise(function (resolve, reject) {
-                func(function (err, result) {
-                    err ? reject(err) : resolve(result);
-                }, options);
-            });
-        }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position, error) {
-                callback(error, position.coords);
-            }, options);
-        }
-    },
-
-    // Is data.metadata.targetGeo intersect with vff.getQueryParams()._targetgeo
-    intersects: function intersects(data) {
-        var isIntersects = false;
-        if (data.metadata && data.metadata.targetGeo && window.vff.getQueryParams() && window.vff.getQueryParams()._targetgeo) {
-            var metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
-            var queryParamBounds = geoHelpers.getBound(window.vff.getQueryParams()._targetgeo);
-
-            isIntersects = queryParamBounds.intersects(metadataBounds);
-        }
-        return isIntersects;
-    },
-
-    // Is my location in data.metadata.targetGeo
-    contains: function contains(data, callback) {
-        var _this = this;
-
-        callback = callback || function () {};
-
-        return new Promise(function (resolve, reject) {
-            var isContains = false;
-            if (data.metadata && data.metadata.targetGeo) {
-                var metadataBounds = geoHelpers.getBound(data.metadata.targetGeo);
-                _this.mine().then(function (coords) {
-                    var myLocation = L.latLng(coords.latitude, coords.longitude, coords.altitude);
-                    var answer = metadataBounds.contains(myLocation);
-                    resolve(answer);
-                    return callback(answer);
-                }, function (err) {
-                    reject(err);
-                    return callback(err, null);
-                });
-            } else {
-                resolve(isContains);
-                return callback(isContains);
-            }
-        });
-    }
-};
-
-module.exports = vffLocationApi;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _leaflet = __webpack_require__(2);
-
-var L = _interopRequireWildcard(_leaflet);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-var geoHelpers = {
-    getBound: function getBound(points) {
-        var pointsArr = points.split(',');
-        var metadata1 = L.latLng(pointsArr[1], pointsArr[0]);
-        var metadata2 = L.latLng(pointsArr[3], pointsArr[2]);
-        return L.latLngBounds(metadata1, metadata2);
-    }
-};
-
-module.exports = geoHelpers;
 
 /***/ })
 /******/ ]);
